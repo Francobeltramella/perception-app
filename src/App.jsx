@@ -1,181 +1,479 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@600;700;800&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { font-family: 'DM Sans', sans-serif; background: #1A1A1A; color: #ffffff; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #111111; color: #F5F1E8; -webkit-font-smoothing: antialiased; }
   :root {
-    --bg:#1A1A1A; --bg2:#212121; --bg3:#262626;
-    --surface:rgba(255,255,255,0.04); --surface2:rgba(255,255,255,0.07);
-    --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.13);
-    --accent:#1A6BFF; --accent2:#F4F1EA; --accent-glow:rgba(26,107,255,0.28);
-    --text:#ffffff; --muted:#888888; --muted2:#bbbbbb;
-    --success:#22d3a5; --warn:#f59e0b; --danger:#ef4444;
+    --bg: #111111;
+    --surface: #1C1C1C;
+    --surface2: #222222;
+    --border: #2B2B2B;
+    --border-hover: #3a3a3a;
+    --text: #F5F1E8;
+    --muted: #A0A0A0;
+    --muted2: #C8C4BC;
+    --copper: #E06A2C;
+    --copper-dim: rgba(224,106,44,0.12);
+    --copper-glow: rgba(224,106,44,0.22);
+    --success: #4CAF82;
+    --warn: #E0A52C;
+    --danger: #E05252;
   }
-  .app { min-height: 100vh; }
-  /* NAV */
-  .nav { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 2rem; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; background:rgba(26,26,26,0.92); backdrop-filter:blur(20px); }
-  .nav-logo { display:flex; align-items:center; gap:0.6rem; font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:-0.02em; color:var(--text); text-decoration:none; cursor:pointer; }
-  .nav-logo-mark { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:800; letter-spacing:-0.01em; color:#fff; flex-shrink:0; }
-  .nav-logo-text span { color:var(--accent2); }
-  .nav-badge { font-size:0.68rem; background:rgba(26,107,255,0.1); border:1px solid rgba(26,107,255,0.22); border-radius:100px; padding:0.25rem 0.8rem; color:var(--accent); letter-spacing:0.06em; text-transform:uppercase; }
-  /* HERO */
-  .hero { max-width:860px; margin:0 auto; padding:8rem 2rem 5rem; text-align:center; position:relative; }
-  .hero::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:700px; height:500px; background:radial-gradient(ellipse at center,rgba(26,107,255,0.09) 0%,transparent 65%); pointer-events:none; }
-  .eyebrow { display:inline-flex; align-items:center; gap:0.5rem; font-size:0.73rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); background:rgba(26,107,255,0.08); border:1px solid rgba(26,107,255,0.18); border-radius:100px; padding:0.4rem 1rem; margin-bottom:2rem; }
-  .eyebrow-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; animation:pulse-dot 2s ease-in-out infinite; flex-shrink:0; }
-  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-  .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(2.5rem,5.5vw,4.2rem); font-weight:800; line-height:1.08; letter-spacing:-0.03em; margin-bottom:1.5rem; }
-  .hero h1 em { font-style:italic; color:var(--accent2); }
-  .hero-sub { font-size:1.15rem; color:var(--muted2); line-height:1.75; max-width:560px; margin:0 auto 3rem; font-weight:300; }
-  .cta-group { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
-  /* BUTTONS */
-  .btn-primary { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:0.9rem 2rem; font-size:0.95rem; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; box-shadow:0 0 28px var(--accent-glow); letter-spacing:-0.01em; }
-  .btn-primary:hover { background:#2d7aff; transform:translateY(-1px); box-shadow:0 6px 36px var(--accent-glow); }
-  .btn-primary:active { transform:translateY(0); }
-  .btn-primary:disabled { opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none; }
-  .btn-secondary { background:var(--surface); color:var(--muted2); border:1px solid var(--border2); border-radius:10px; padding:0.9rem 2rem; font-size:0.95rem; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .btn-secondary:hover { background:var(--surface2); color:var(--text); border-color:rgba(255,255,255,0.2); }
-  /* STATS */
-  .stats-row { display:flex; justify-content:center; gap:0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); flex-wrap:wrap; }
-  .stat { text-align:center; padding:2.5rem 3rem; border-right:1px solid var(--border); }
-  .stat:last-child { border-right:none; }
-  .stat-num { font-family:'Syne',sans-serif; font-size:1.9rem; font-weight:800; color:var(--text); }
-  .stat-label { font-size:0.78rem; color:var(--muted); margin-top:0.3rem; letter-spacing:0.04em; }
-  /* HOW */
-  .how { max-width:920px; margin:0 auto; padding:7rem 2rem; }
-  .section-label { font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; }
-  .section-title { font-family:'Syne',sans-serif; font-size:2.1rem; font-weight:800; margin-bottom:3rem; letter-spacing:-0.025em; }
-  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1.5rem; }
-  .step { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:1.75rem; position:relative; overflow:hidden; transition:border-color 0.2s; }
-  .step:hover { border-color:var(--border2); }
-  .step::before { content:''; position:absolute; top:0; right:0; width:100px; height:100px; background:radial-gradient(ellipse at top right,rgba(26,107,255,0.06),transparent); }
-  .step-num { font-family:'Syne',sans-serif; font-size:3.2rem; font-weight:800; color:rgba(26,107,255,0.14); line-height:1; margin-bottom:1.25rem; }
-  .step-title { font-size:0.9rem; font-weight:600; margin-bottom:0.6rem; color:var(--text); }
-  .step-desc { font-size:0.82rem; color:var(--muted); line-height:1.65; }
-  /* FORM */
-  .form-section { max-width:660px; margin:0 auto; padding:4rem 2rem 7rem; }
-  .form-card { background:var(--bg3); border:1px solid var(--border2); border-radius:22px; padding:2.75rem; }
-  .form-progress { display:flex; gap:0.35rem; margin-bottom:2.75rem; }
-  .progress-dot { flex:1; height:3px; border-radius:2px; background:var(--border2); transition:background 0.35s; }
-  .progress-dot.active { background:var(--accent); }
-  .progress-dot.done { background:var(--accent); opacity:0.5; }
-  .question-label { font-family:'Syne',sans-serif; font-size:1.35rem; font-weight:700; margin-bottom:0.5rem; letter-spacing:-0.015em; line-height:1.3; }
-  .question-sub { font-size:0.84rem; color:var(--muted); margin-bottom:1.85rem; line-height:1.6; }
-  .option-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.7rem; margin-bottom:2rem; }
-  .option-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; font-size:0.84rem; color:var(--muted2); cursor:pointer; font-family:inherit; text-align:left; transition:all 0.15s; line-height:1.4; }
-  .option-btn:hover { border-color:var(--border2); color:var(--text); background:var(--surface2); }
-  .option-btn.selected { border-color:var(--accent); color:#fff; background:rgba(26,107,255,0.12); }
-  .text-input { width:100%; background:var(--surface); border:1px solid var(--border2); border-radius:10px; padding:0.9rem 1.2rem; font-size:0.9rem; color:var(--text); font-family:inherit; outline:none; transition:border 0.2s,box-shadow 0.2s; margin-bottom:2rem; resize:none; line-height:1.6; }
-  .text-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
-  .text-input::placeholder { color:var(--muted); }
-  .url-input { width:100%; background:var(--surface); border:1px solid var(--border2); border-radius:10px; padding:0.9rem 1.2rem; font-size:0.95rem; color:var(--text); font-family:inherit; outline:none; transition:border 0.2s,box-shadow 0.2s; margin-bottom:1.5rem; }
-  .url-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
-  .url-input::placeholder { color:var(--muted); }
-  .form-nav { display:flex; justify-content:space-between; align-items:center; }
-  .form-nav-back { background:none; border:none; color:var(--muted); font-family:inherit; font-size:0.85rem; cursor:pointer; padding:0.5rem 0; transition:color 0.15s; }
-  .form-nav-back:hover { color:var(--text); }
-  .error-box { background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.22); border-radius:10px; padding:1rem 1.2rem; margin-bottom:1.25rem; font-size:0.84rem; color:#fca5a5; line-height:1.6; }
-  /* LOADING */
-  .loading-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:85vh; padding:2rem; text-align:center; }
-  .loading-ring { width:84px; height:84px; border-radius:50%; border:2px solid var(--border); border-top-color:var(--accent); animation:spin 1.1s linear infinite; margin-bottom:2.75rem; position:relative; flex-shrink:0; }
-  .loading-ring::after { content:''; position:absolute; inset:7px; border-radius:50%; border:2px solid var(--border); border-bottom-color:rgba(244,241,234,0.5); animation:spin 1.9s linear infinite reverse; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .loading-msg { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:0.6rem; }
-  .loading-sub { font-size:0.84rem; color:var(--muted); max-width:380px; line-height:1.6; }
-  .loading-steps { display:flex; flex-direction:column; gap:0.55rem; margin-top:2.75rem; text-align:left; width:100%; max-width:300px; }
-  .ls-item { display:flex; align-items:center; gap:0.75rem; font-size:0.81rem; color:var(--muted); transition:color 0.3s; }
-  .ls-item.done { color:var(--success); }
-  .ls-item.active { color:var(--text); }
-  .ls-check { width:16px; height:16px; border-radius:50%; border:1px solid var(--border2); flex-shrink:0; transition:all 0.3s; display:flex; align-items:center; justify-content:center; font-size:9px; }
-  .ls-item.done .ls-check { background:var(--success); border-color:var(--success); color:#fff; }
-  .ls-item.active .ls-check { border-color:var(--accent); animation:pulse-ring 1s ease-in-out infinite; }
-  @keyframes pulse-ring { 0%,100%{box-shadow:0 0 0 0 rgba(26,107,255,0.4)} 50%{box-shadow:0 0 0 5px transparent} }
-  /* RESULTS */
-  .results { max-width:940px; margin:0 auto; padding:4.5rem 2rem 7rem; }
-  .results-header { text-align:center; margin-bottom:4.5rem; }
-  .url-meta { font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:1.75rem; }
-  .opportunity-row { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:1.5rem 0; }
-  .opp-chip { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1rem 1.75rem; text-align:center; }
-  .opp-val { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; }
-  .opp-val.potential { color:var(--accent2); }
-  .opp-val.gap { color:var(--accent); }
-  .opp-label { font-size:0.7rem; color:var(--muted); margin-top:0.2rem; letter-spacing:0.08em; text-transform:uppercase; }
-  .results-summary { max-width:600px; margin:0 auto; font-size:1rem; color:var(--muted2); line-height:1.75; }
-  /* PERCEPT */
-  .section-block { margin:3.5rem 0; }
-  .block-title { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:0.4rem; }
-  .block-sub { font-size:0.84rem; color:var(--muted); margin-bottom:2rem; line-height:1.6; }
-  .percept-items { display:flex; flex-direction:column; gap:1.1rem; }
-  .percept-item { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.25rem 1.5rem; transition:border-color 0.2s; }
-  .percept-item:hover { border-color:var(--border2); }
-  .percept-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.7rem; }
-  .percept-left { display:flex; align-items:center; gap:0.6rem; }
-  .percept-letter { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:800; letter-spacing:0.14em; color:var(--muted); }
-  .percept-name { font-size:0.85rem; font-weight:500; color:var(--text); }
-  .bar-track { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
-  .bar-fill { height:100%; border-radius:2px; transition:width 1.3s cubic-bezier(0.16,1,0.3,1); }
-  .percept-desc { font-size:0.74rem; color:var(--muted); margin-top:0.5rem; line-height:1.55; }
-  /* INSIGHTS */
-  .insight-list { display:flex; flex-direction:column; gap:0.7rem; }
-  .insight-item { display:flex; align-items:flex-start; gap:0.8rem; padding:1rem 1.25rem; background:var(--surface); border:1px solid var(--border); border-radius:12px; }
-  .insight-icon { font-size:0.8rem; flex-shrink:0; margin-top:0.1rem; font-weight:700; }
-  .insight-icon.ok { color:var(--success); }
-  .insight-icon.warn { color:var(--warn); }
-  .insight-text { font-size:0.87rem; line-height:1.6; }
-  /* LOCKED */
-  .locked-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:1rem; }
-  .locked-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.4rem; position:relative; overflow:hidden; min-height:108px; }
-  .locked-card::before { content:''; position:absolute; inset:0; background:rgba(26,26,26,0.68); backdrop-filter:blur(4px); border-radius:14px; z-index:1; }
-  .locked-content { filter:blur(2px); user-select:none; }
-  .locked-badge { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:0.45rem; z-index:2; }
-  .locked-pill { font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted2); background:var(--bg3); border:1px solid var(--border2); border-radius:100px; padding:0.25rem 0.8rem; white-space:nowrap; }
-  .locked-card-title { font-size:0.88rem; font-weight:600; margin-bottom:0.4rem; color:var(--text); }
-  .locked-card-desc { font-size:0.79rem; color:var(--muted); line-height:1.55; }
-  /* CTA */
-  .cta-box { background:var(--bg3); border:1px solid var(--border2); border-radius:22px; padding:3.5rem 2rem; text-align:center; margin:3.5rem 0; position:relative; overflow:hidden; }
-  .cta-box::before { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:500px; height:350px; background:radial-gradient(ellipse at center,rgba(26,107,255,0.1) 0%,transparent 65%); pointer-events:none; }
-  .cta-box h2 { font-family:'Syne',sans-serif; font-size:1.9rem; font-weight:800; margin-bottom:0.85rem; letter-spacing:-0.025em; position:relative; }
-  .cta-box p { color:var(--muted2); margin-bottom:2.25rem; max-width:460px; margin-left:auto; margin-right:auto; font-size:0.95rem; line-height:1.7; position:relative; }
-  .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; position:relative; }
-  /* FOOTER */
-  .footer { border-top:1px solid var(--border); padding:2.5rem 2rem; text-align:center; font-size:0.78rem; color:var(--muted); line-height:1.8; }
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── NAV ── */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(17,17,17,0.94);
+    backdrop-filter: blur(16px);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 0.65rem;
+    cursor: pointer; text-decoration: none;
+  }
+  .nav-logo-text {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 700; font-size: 0.95rem;
+    letter-spacing: -0.01em; color: var(--text);
+  }
+  .nav-badge {
+    font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--copper); border: 1px solid rgba(224,106,44,0.3);
+    border-radius: 999px; padding: 0.22rem 0.75rem;
+  }
+
+  /* ── EYE LOGO ── */
+  .eye-logo { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 820px; margin: 0 auto;
+    padding: 7rem 2rem 5rem; text-align: center; position: relative;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 420px;
+    background: radial-gradient(ellipse at center, rgba(224,106,44,0.06) 0%, transparent 68%);
+    pointer-events: none;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--copper); border: 1px solid rgba(224,106,44,0.22);
+    border-radius: 999px; padding: 0.35rem 1rem; margin-bottom: 2.25rem;
+  }
+  .eyebrow-dot {
+    width: 5px; height: 5px; background: var(--copper); border-radius: 50%;
+    animation: pulse-dot 2.2s ease-in-out infinite; flex-shrink: 0;
+  }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.65)} }
+
+  .hero h1 {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: clamp(2.6rem, 5.8vw, 4.4rem);
+    font-weight: 800; line-height: 1.06; letter-spacing: -0.03em;
+    margin-bottom: 1.5rem; color: var(--text);
+  }
+  .hero h1 em { font-style: normal; color: var(--copper); }
+  .hero-sub {
+    font-size: 1.1rem; color: var(--muted); line-height: 1.8;
+    max-width: 520px; margin: 0 auto 2.75rem; font-weight: 400;
+  }
+  .hero-tagline {
+    font-size: 0.78rem; color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-top: 2rem;
+  }
+  .cta-group { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: var(--copper); color: #111111;
+    border: none; border-radius: 999px;
+    padding: 0.85rem 2rem; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.18s; letter-spacing: -0.01em;
+  }
+  .btn-primary:hover { background: #f07a3c; transform: translateY(-1px); box-shadow: 0 8px 28px var(--copper-glow); }
+  .btn-primary:active { transform: translateY(0); box-shadow: none; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .btn-secondary {
+    background: transparent; color: var(--muted2);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.85rem 2rem; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; font-family: inherit; transition: all 0.18s;
+  }
+  .btn-secondary:hover { border-color: var(--border-hover); color: var(--text); background: rgba(255,255,255,0.03); }
+
+  /* ── STATS ── */
+  .stats-row {
+    display: flex; justify-content: center;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; padding: 2.25rem 2.75rem; border-right: 1px solid var(--border); flex: 1; min-width: 140px; }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.7rem; font-weight: 800; color: var(--text);
+  }
+  .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; letter-spacing: 0.04em; }
+
+  /* ── HOW ── */
+  .how { max-width: 920px; margin: 0 auto; padding: 7rem 2rem; }
+  .section-label { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+  .section-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800;
+    margin-bottom: 3rem; letter-spacing: -0.025em; color: var(--text);
+  }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.75rem; position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .step:hover { border-color: var(--border-hover); }
+  .step-num {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 2.8rem; font-weight: 800; color: rgba(224,106,44,0.12);
+    line-height: 1; margin-bottom: 1.25rem;
+  }
+  .step-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+  .step-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+  /* ── FORM ── */
+  .form-section { max-width: 600px; margin: 0 auto; padding: 4rem 2rem 7rem; flex: 1; }
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 2.5rem; }
+  .form-progress { display: flex; gap: 0.3rem; margin-bottom: 2.5rem; }
+  .progress-dot { flex: 1; height: 2px; border-radius: 1px; background: var(--border); transition: background 0.3s; }
+  .progress-dot.active { background: var(--copper); }
+  .progress-dot.done { background: rgba(224,106,44,0.4); }
+  .question-label {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.3rem; font-weight: 700; margin-bottom: 0.45rem;
+    letter-spacing: -0.015em; line-height: 1.3; color: var(--text);
+  }
+  .question-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.75rem; line-height: 1.65; }
+  .option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; margin-bottom: 2rem; }
+  .option-btn {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.83rem;
+    color: var(--muted2); cursor: pointer; font-family: inherit;
+    text-align: left; transition: all 0.15s; line-height: 1.4;
+  }
+  .option-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .option-btn.selected { border-color: var(--copper); color: var(--copper); background: var(--copper-dim); }
+  .text-input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.85rem 1.1rem; font-size: 0.88rem;
+    color: var(--text); font-family: inherit; outline: none;
+    transition: border 0.2s, box-shadow 0.2s; margin-bottom: 2rem;
+    resize: none; line-height: 1.6;
+  }
+  .text-input:focus { border-color: var(--copper); box-shadow: 0 0 0 3px var(--copper-glow); }
+  .text-input::placeholder { color: var(--muted); }
+  .url-input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.85rem 1.1rem; font-size: 0.9rem;
+    color: var(--text); font-family: inherit; outline: none;
+    transition: border 0.2s, box-shadow 0.2s; margin-bottom: 1.25rem;
+  }
+  .url-input:focus { border-color: var(--copper); box-shadow: 0 0 0 3px var(--copper-glow); }
+  .url-input::placeholder { color: var(--muted); }
+  .form-nav { display: flex; justify-content: space-between; align-items: center; }
+  .form-nav-back {
+    background: none; border: none; color: var(--muted);
+    font-family: inherit; font-size: 0.84rem; cursor: pointer;
+    padding: 0.5rem 0; transition: color 0.15s;
+  }
+  .form-nav-back:hover { color: var(--text); }
+  .error-box {
+    background: rgba(224,82,82,0.07); border: 1px solid rgba(224,82,82,0.2);
+    border-radius: 10px; padding: 0.9rem 1.1rem; margin-bottom: 1.1rem;
+    font-size: 0.82rem; color: #f4a0a0; line-height: 1.6;
+  }
+
+  /* ── LOADING ── */
+  .loading-screen {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 85vh; padding: 2rem; text-align: center;
+  }
+  .loading-eye { margin-bottom: 2.5rem; opacity: 0.9; }
+  .loading-eye svg { animation: breathe 2.4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scale(1);opacity:0.85} 50%{transform:scale(1.06);opacity:1} }
+  .loading-msg {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.15rem; font-weight: 700; margin-bottom: 0.55rem; color: var(--text);
+  }
+  .loading-sub { font-size: 0.82rem; color: var(--muted); max-width: 360px; line-height: 1.65; }
+  .loading-steps {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    margin-top: 2.5rem; text-align: left; width: 100%; max-width: 280px;
+  }
+  .ls-item { display: flex; align-items: center; gap: 0.7rem; font-size: 0.79rem; color: var(--muted); transition: color 0.3s; }
+  .ls-item.done { color: var(--success); }
+  .ls-item.active { color: var(--text); }
+  .ls-check {
+    width: 15px; height: 15px; border-radius: 50%; border: 1px solid var(--border);
+    flex-shrink: 0; transition: all 0.3s; display: flex; align-items: center;
+    justify-content: center; font-size: 8px;
+  }
+  .ls-item.done .ls-check { background: var(--success); border-color: var(--success); color: #111; }
+  .ls-item.active .ls-check { border-color: var(--copper); animation: pulse-ring 1.1s ease-in-out infinite; }
+  @keyframes pulse-ring { 0%,100%{box-shadow:0 0 0 0 rgba(224,106,44,0.38)} 50%{box-shadow:0 0 0 5px transparent} }
+
+  /* ── RESULTS ── */
+  .results { max-width: 900px; margin: 0 auto; padding: 4rem 2rem 7rem; }
+  .results-header { text-align: center; margin-bottom: 4rem; }
+  .url-meta {
+    font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 2rem;
+  }
+
+  /* score ring */
+  .score-ring-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto 1.5rem; }
+  .score-ring-inner {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .score-number {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 3.5rem; font-weight: 800; line-height: 1; color: var(--copper);
+  }
+  .score-denom { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+  .score-label {
+    font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-top: 0.4rem;
+  }
+  .score-grade {
+    font-size: 0.78rem; font-weight: 600; color: var(--text);
+    margin-top: 0.2rem; letter-spacing: 0.02em;
+  }
+
+  .opportunity-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0; }
+  .opp-chip {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1rem 1.75rem; text-align: center;
+    min-width: 130px;
+  }
+  .opp-val {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.55rem; font-weight: 800;
+  }
+  .opp-val.potential { color: var(--text); }
+  .opp-val.gap { color: var(--copper); }
+  .opp-label { font-size: 0.66rem; color: var(--muted); margin-top: 0.25rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .results-summary { max-width: 560px; margin: 0 auto; font-size: 0.95rem; color: var(--muted2); line-height: 1.8; }
+
+  /* ── PERCEPT ── */
+  .section-block { margin: 3rem 0; }
+  .block-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text);
+  }
+  .block-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.75rem; line-height: 1.65; }
+  .percept-items { display: flex; flex-direction: column; gap: 0.9rem; }
+  .percept-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.2rem 1.4rem; transition: border-color 0.2s;
+  }
+  .percept-item:hover { border-color: var(--border-hover); }
+  .percept-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; }
+  .percept-left { display: flex; align-items: center; gap: 0.55rem; }
+  .percept-letter {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.16em;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .percept-name { font-size: 0.84rem; font-weight: 500; color: var(--text); }
+  .bar-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; transition: width 1.4s cubic-bezier(0.16,1,0.3,1); }
+  .percept-desc { font-size: 0.72rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.6; }
+
+  /* ── INSIGHTS ── */
+  .insight-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .insight-item {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.95rem 1.2rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+  }
+  .insight-icon { font-size: 0.75rem; flex-shrink: 0; margin-top: 0.12rem; font-weight: 700; }
+  .insight-icon.ok { color: var(--success); }
+  .insight-icon.warn { color: var(--warn); }
+  .insight-text { font-size: 0.84rem; line-height: 1.65; }
+
+  /* ── LOCKED ── */
+  .locked-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.9rem; }
+  .locked-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.3rem; position: relative;
+    overflow: hidden; min-height: 100px;
+  }
+  .locked-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(17,17,17,0.72); backdrop-filter: blur(5px);
+    border-radius: 16px; z-index: 1;
+  }
+  .locked-content { filter: blur(2px); user-select: none; }
+  .locked-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem; z-index: 2;
+  }
+  .locked-pill {
+    font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted2); background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.2rem 0.75rem; white-space: nowrap;
+  }
+  .locked-card-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text); }
+  .locked-card-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── CTA ── */
+  .cta-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 3.5rem 2rem; text-align: center;
+    margin: 3rem 0; position: relative; overflow: hidden;
+  }
+  .cta-box::before {
+    content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 280px;
+    background: radial-gradient(ellipse at center, rgba(224,106,44,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-box h2 {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 800;
+    margin-bottom: 0.8rem; letter-spacing: -0.02em;
+    position: relative; color: var(--text);
+  }
+  .cta-box p {
+    color: var(--muted); margin-bottom: 2rem; max-width: 440px;
+    margin-left: auto; margin-right: auto; font-size: 0.92rem;
+    line-height: 1.75; position: relative;
+  }
+  .cta-btns { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; position: relative; }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border); padding: 2rem 2rem;
+    text-align: center; font-size: 0.74rem; color: var(--muted); line-height: 2;
+    margin-top: auto;
+  }
+  .footer-logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .footer-tagline { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.06em; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 0; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 600px) {
+    .nav { padding: 1rem 1.25rem; }
+    .hero { padding: 5rem 1.25rem 3.5rem; }
+    .stats-row { flex-direction: column; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat:last-child { border-bottom: none; }
+    .how { padding: 4rem 1.25rem; }
+    .form-section { padding: 2.5rem 1.25rem 5rem; }
+    .form-card { padding: 1.75rem 1.25rem; }
+    .results { padding: 3rem 1.25rem 5rem; }
+    .cta-box { padding: 2.5rem 1.25rem; }
+  }
 `;
 
+/* ── Eye SVG logo component ── */
+function EyeLogo({ size = 36 }) {
+  const s = size;
+  return (
+    <svg width={s} height={s * 0.56} viewBox="0 0 64 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* eye outline */}
+      <path
+        d="M32 2C18 2 4 18 4 18C4 18 18 34 32 34C46 34 60 18 60 18C60 18 46 2 32 2Z"
+        stroke="#F5F1E8" strokeWidth="2.2" fill="none" strokeLinejoin="round"
+      />
+      {/* iris circle */}
+      <circle cx="32" cy="18" r="9" stroke="#F5F1E8" strokeWidth="2" fill="none"/>
+      {/* PS text */}
+      <text x="32" y="22.5" textAnchor="middle"
+        fontFamily="'Inter Tight','Inter',sans-serif" fontWeight="800"
+        fontSize="9" fill="#E06A2C" letterSpacing="-0.5">PS</text>
+    </svg>
+  );
+}
+
+/* ── Score grade label ── */
+function gradeLabel(score) {
+  if (score >= 90) return "Excellent Perception";
+  if (score >= 75) return "Good Perception";
+  if (score >= 60) return "Moderate Perception";
+  if (score >= 45) return "Below Average";
+  return "Needs Attention";
+}
+
+/* ── Score Ring ── */
+function ScoreRing({ score }) {
+  const r = 80, circ = 2 * Math.PI * r, dash = (score / 100) * circ;
+  return (
+    <div className="score-ring-wrap">
+      <svg viewBox="0 0 200 200" style={{ width:"100%", height:"100%", transform:"rotate(-90deg)" }}>
+        <defs>
+          <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#E06A2C"/>
+            <stop offset="100%" stopColor="#f0a070"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r={r} fill="none" stroke="#2B2B2B" strokeWidth={10}/>
+        <circle cx="100" cy="100" r={r} fill="none" stroke="url(#sg)" strokeWidth={10}
+          strokeLinecap="round" strokeDasharray={`${dash} ${circ}`}
+          style={{ transition:"stroke-dasharray 1.6s cubic-bezier(0.16,1,0.3,1)" }}/>
+      </svg>
+      <div className="score-ring-inner">
+        <div className="score-number">{score}</div>
+        <div className="score-denom">/ 100</div>
+        <div className="score-label">Perception Score</div>
+        <div className="score-grade">{gradeLabel(score)}</div>
+      </div>
+    </div>
+  );
+}
+
 const QUESTIONS = [
-  { id:"type", label:"What type of business do you have?", sub:"We'll calibrate the analysis to your market and industry.", options:["SaaS","Agency","Personal Brand","Ecommerce","Service Business","Other"] },
-  { id:"goal", label:"What is your primary goal?", sub:"This shapes how we evaluate your conversion potential.", options:["Generate leads","Book calls","Sell products","Build authority","Showcase work","Other"] },
-  { id:"client", label:"Who is your ideal client?", sub:"Describe the person or company you're trying to attract.", type:"text", placeholder:"e.g. B2B SaaS founders scaling from $1M to $10M ARR" },
-  { id:"value", label:"What is the average value of your offer?", sub:"Higher-value offers require stronger trust and authority signals.", options:["Under $500","$500–$2,000","$2,000–$10,000","$10,000+"] },
-  { id:"holding", label:"What's holding your website back?", sub:"Your honest assessment helps us focus on what matters most.", options:["Doesn't feel premium","Doesn't convert","Message isn't clear","Looks outdated","Not sure"] },
-  { id:"url", label:"Enter your website URL", sub:"We'll analyze your site's real content, copy and perception signals.", type:"url", placeholder:"https://yourwebsite.com" }
+  { id:"type",    label:"What type of business do you have?",       sub:"We calibrate the analysis to your market and industry.",          options:["SaaS","Agency","Personal Brand","Ecommerce","Service Business","Other"] },
+  { id:"goal",    label:"What is your primary goal?",               sub:"This shapes how we evaluate your conversion potential.",          options:["Generate leads","Book calls","Sell products","Build authority","Showcase work","Other"] },
+  { id:"client",  label:"Who is your ideal client?",                sub:"Describe the person or company you're trying to attract.",        type:"text", placeholder:"e.g. B2B SaaS founders scaling from $1M to $10M ARR" },
+  { id:"value",   label:"What is the average value of your offer?", sub:"Higher-value offers require stronger trust and authority signals.", options:["Under $500","$500–$2,000","$2,000–$10,000","$10,000+"] },
+  { id:"holding", label:"What's holding your website back?",        sub:"Your honest assessment helps us focus on what matters most.",     options:["Doesn't feel premium","Doesn't convert","Message isn't clear","Looks outdated","Not sure"] },
+  { id:"url",     label:"Enter your website URL",                   sub:"We'll read your live content, copy, and perception signals.",    type:"url", placeholder:"https://yourwebsite.com" },
 ];
 
 const PERCEPT_META = [
-  { letter:"P", name:"Positioning", color:"#1A6BFF" },
-  { letter:"E", name:"Expertise",   color:"#4d8fff" },
-  { letter:"R", name:"Relevance",   color:"#F4F1EA" },
-  { letter:"C", name:"Credibility", color:"#7ab0ff" },
-  { letter:"E", name:"Experience",  color:"#f59e0b" },
-  { letter:"P", name:"Premium Feel",color:"#F4F1EA" },
-  { letter:"T", name:"Trust",       color:"#22d3a5" },
+  { letter:"P", name:"Positioning",  color:"#E06A2C" },
+  { letter:"E", name:"Expertise",    color:"#d4884a" },
+  { letter:"R", name:"Relevance",    color:"#c9a87c" },
+  { letter:"C", name:"Credibility",  color:"#E06A2C" },
+  { letter:"E", name:"Experience",   color:"#d4884a" },
+  { letter:"P", name:"Premium Feel", color:"#c9a87c" },
+  { letter:"T", name:"Trust",        color:"#E06A2C" },
 ];
 
 const LOCKED_CARDS = [
-  { title:"Premium Positioning Strategy",        desc:"Step-by-step repositioning framework tailored to your market and price point." },
-  { title:"Conversion Flow Analysis",            desc:"Where visitors are dropping off and exactly how to fix each friction point." },
-  { title:"Authority Building Roadmap",          desc:"12 specific changes to establish you as the obvious choice in your niche." },
-  { title:"High-Ticket Positioning",             desc:"How to restructure your offer and website to attract $10K+ clients." },
-  { title:"Trust Optimization Plan",             desc:"The exact trust signals you're missing and the precise places to add them." },
-  { title:"Competitor Gap Analysis",             desc:"What your top competitors do better — and a plan to leapfrog them." },
+  { title:"Premium Positioning Strategy",  desc:"Step-by-step repositioning framework tailored to your market and price point." },
+  { title:"Conversion Flow Analysis",      desc:"Where visitors are dropping off and exactly how to fix each friction point." },
+  { title:"Authority Building Roadmap",    desc:"12 specific changes to establish you as the obvious choice in your niche." },
+  { title:"High-Ticket Positioning",       desc:"How to restructure your offer and website to attract $10K+ clients." },
+  { title:"Trust Optimization Plan",       desc:"The exact trust signals you're missing and the precise places to add them." },
+  { title:"Competitor Gap Analysis",       desc:"What your top competitors do better — and a plan to leapfrog them." },
 ];
 
 const LOADING_STEPS = [
   "Accessing website",
   "Extracting content and copy",
-  "Analyzing positioning",
-  "Evaluating trust signals",
+  "Analyzing positioning signals",
+  "Evaluating trust indicators",
   "Measuring premium perception",
   "Calculating P.E.R.C.E.P.T. scores",
   "Generating personalized insights",
@@ -210,43 +508,17 @@ async function runAnalysis(answers, siteContent) {
   return res.json();
 }
 
-function ScoreRing({ score }) {
-  const r = 80, circ = 2 * Math.PI * r, dash = (score / 100) * circ;
-  return (
-    <div style={{ position:"relative", width:200, height:200, margin:"0 auto 1.5rem" }}>
-      <svg viewBox="0 0 200 200" style={{ width:"100%", height:"100%", transform:"rotate(-90deg)" }}>
-        <defs>
-          <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#1A6BFF"/>
-            <stop offset="100%" stopColor="#F4F1EA"/>
-          </linearGradient>
-        </defs>
-        <circle cx="100" cy="100" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={12}/>
-        <circle cx="100" cy="100" r={r} fill="none" stroke="url(#sg)" strokeWidth={12} strokeLinecap="round"
-          strokeDasharray={`${dash} ${circ}`} style={{ transition:"stroke-dasharray 1.5s cubic-bezier(0.16,1,0.3,1)" }}/>
-      </svg>
-      <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-        <div style={{ fontFamily:"'Syne',sans-serif", fontSize:"3.2rem", fontWeight:800, lineHeight:1 }}>{score}</div>
-        <div style={{ fontSize:"0.78rem", color:"#888888", marginTop:"0.25rem" }}>/ 100</div>
-        <div style={{ fontSize:"0.6rem", letterSpacing:"0.12em", textTransform:"uppercase", color:"#888888", marginTop:"0.3rem" }}>Perception Score</div>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
-  const [view, setView]       = useState("landing");
-  const [step, setStep]       = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [view,     setView]     = useState("landing");
+  const [step,     setStep]     = useState(0);
+  const [answers,  setAnswers]  = useState({});
   const [loadStep, setLoadStep] = useState(0);
   const [animBars, setAnimBars] = useState(false);
-  const [report, setReport]   = useState(null);
-  const [error, setError]     = useState(null);
+  const [report,   setReport]   = useState(null);
+  const [error,    setError]    = useState(null);
 
   const startAnalysis = async (ans) => {
-    setView("loading");
-    setLoadStep(0);
-    setError(null);
+    setView("loading"); setLoadStep(0); setError(null);
     const timer = setInterval(() => setLoadStep(s => Math.min(s + 1, LOADING_STEPS.length - 2)), 1500);
     try {
       const siteContent = await fetchSiteContent(ans.url);
@@ -258,8 +530,7 @@ export default function App() {
     } catch (e) {
       clearInterval(timer);
       setError(e.message || "Analysis could not be completed. Check the URL and try again.");
-      setView("form");
-      setStep(5);
+      setView("form"); setStep(5);
     }
   };
 
@@ -285,11 +556,12 @@ export default function App() {
     <>
       <style>{css}</style>
       <div className="app">
-        {/* NAV */}
+
+        {/* ── NAV ── */}
         <nav className="nav">
           <div className="nav-logo" onClick={reset}>
-            <div className="nav-logo-mark">PS</div>
-            <span className="nav-logo-text">Perception<span>Score</span></span>
+            <EyeLogo size={40}/>
+            <span className="nav-logo-text">Perception Score</span>
           </div>
           <div className="nav-badge">Beta</div>
         </nav>
@@ -298,30 +570,38 @@ export default function App() {
         {view === "landing" && (
           <>
             <section className="hero">
-              <div className="eyebrow"><div className="eyebrow-dot"/>Website Perception Intelligence</div>
-              <h1>Your website is not<br/>just being viewed.<br/><em>It's being judged.</em></h1>
-              <p className="hero-sub">Discover how potential clients perceive your website. Uncover hidden opportunities to increase trust, authority and conversion potential.</p>
+              <div className="eyebrow"><div className="eyebrow-dot"/>Perception Intelligence Platform</div>
+              <h1>Your website is being<br/>judged before it is<br/><em>ever read.</em></h1>
+              <p className="hero-sub">
+                Measure the trust, authority, and credibility signals your website communicates.
+                See your site through your customer's eyes.
+              </p>
               <div className="cta-group">
-                <button className="btn-primary" onClick={() => setView("form")}>Get My Perception Score</button>
+                <button className="btn-primary" onClick={() => setView("form")}>
+                  Analyze My Website
+                </button>
               </div>
+              <p className="hero-tagline">Understand How You Are Perceived</p>
             </section>
 
+            <div className="divider"/>
             <div className="stats-row">
               <div className="stat"><div className="stat-num">P.E.R.C.E.P.T.</div><div className="stat-label">Proprietary framework</div></div>
               <div className="stat"><div className="stat-num">7</div><div className="stat-label">Perception dimensions</div></div>
               <div className="stat"><div className="stat-num">~30s</div><div className="stat-label">Analysis time</div></div>
-              <div className="stat"><div className="stat-num">Real data</div><div className="stat-label">Live site analysis</div></div>
+              <div className="stat"><div className="stat-num">Live</div><div className="stat-label">Real site content</div></div>
             </div>
+            <div className="divider"/>
 
             <section className="how">
               <div className="section-label">How it works</div>
-              <div className="section-title">Four steps to clarity.</div>
+              <div className="section-title">First impressions<br/>are measurable.</div>
               <div className="steps">
                 {[
-                  ["Tell us about your business.", "Share context so we can calibrate the analysis to your industry and price point."],
-                  ["Paste your website URL.",      "We access your site's real content — copy, headings, CTAs, structure."],
-                  ["We analyze your site.",        "Our engine reads your content and scores 7 perception dimensions in real time."],
-                  ["Receive your report.",         "Real scores and specific insights tailored to your exact situation."],
+                  ["Context.",    "Share your business type and goals so we can calibrate the analysis to your market."],
+                  ["URL.",        "Paste your website. We read your live content — copy, headings, CTAs, structure."],
+                  ["Analysis.",   "Our engine scores 7 perception dimensions from your real site data, not guesses."],
+                  ["Insights.",   "Receive specific, actionable findings. No generic advice. No SEO fluff."],
                 ].map(([t, d], i) => (
                   <div className="step" key={i}>
                     <div className="step-num">0{i + 1}</div>
@@ -333,8 +613,8 @@ export default function App() {
             </section>
 
             <div style={{ textAlign:"center", padding:"0 2rem 7rem" }}>
-              <button className="btn-primary" style={{ fontSize:"1rem", padding:"1rem 2.75rem" }} onClick={() => setView("form")}>
-                Analyze My Website →
+              <button className="btn-primary" style={{ fontSize:"0.95rem", padding:"0.95rem 2.5rem" }} onClick={() => setView("form")}>
+                Get My Perception Score
               </button>
             </div>
           </>
@@ -378,7 +658,7 @@ export default function App() {
                   <div className="form-nav">
                     <button className="form-nav-back" onClick={() => setStep(s => s - 1)}>← Back</button>
                     <button className="btn-primary" onClick={() => startAnalysis(answers)} disabled={!answers.url}>
-                      Analyze My Website →
+                      Run Analysis →
                     </button>
                   </div>
                 </>
@@ -387,7 +667,8 @@ export default function App() {
               {!q.type && (
                 <div className="option-grid">
                   {q.options.map(opt => (
-                    <button key={opt} className={`option-btn ${answers[q.id] === opt ? "selected" : ""}`}
+                    <button key={opt}
+                      className={`option-btn ${answers[q.id] === opt ? "selected" : ""}`}
                       onClick={() => handleOption(opt)}>{opt}</button>
                   ))}
                 </div>
@@ -399,9 +680,9 @@ export default function App() {
         {/* ── LOADING ── */}
         {view === "loading" && (
           <div className="loading-screen">
-            <div className="loading-ring"/>
+            <div className="loading-eye"><EyeLogo size={72}/></div>
             <div className="loading-msg">{LOADING_STEPS[loadStep]}</div>
-            <div className="loading-sub">Running full perception analysis on {answers.url}</div>
+            <div className="loading-sub">Running perception analysis on {answers.url}</div>
             <div className="loading-steps">
               {LOADING_STEPS.map((s, i) => (
                 <div key={i} className={`ls-item ${i < loadStep ? "done" : i === loadStep ? "active" : ""}`}>
@@ -435,7 +716,7 @@ export default function App() {
             {/* PERCEPT BARS */}
             <div className="section-block">
               <div className="block-title">P.E.R.C.E.P.T. Framework</div>
-              <div className="block-sub">Your score across 7 perception dimensions — analyzed from your live site content</div>
+              <div className="block-sub">Seven perception dimensions scored from your live site content</div>
               <div className="percept-items">
                 {PERCEPT_META.map((item, i) => (
                   <div key={i} className="percept-item">
@@ -444,10 +725,10 @@ export default function App() {
                         <span className="percept-letter">{item.letter}</span>
                         <span className="percept-name">{item.name}</span>
                       </div>
-                      <span style={{ fontFamily:"'Syne',sans-serif", fontSize:"1rem", fontWeight:700, color:item.color }}>{scores[i]}</span>
+                      <span style={{ fontFamily:"'Inter Tight','Inter',sans-serif", fontSize:"0.95rem", fontWeight:700, color:item.color }}>{scores[i]}</span>
                     </div>
                     <div className="bar-track">
-                      <div className="bar-fill" style={{ width: animBars ? `${scores[i]}%` : "0%", background:`linear-gradient(90deg,${item.color}50,${item.color})` }}/>
+                      <div className="bar-fill" style={{ width: animBars ? `${scores[i]}%` : "0%", background:`linear-gradient(90deg,${item.color}60,${item.color})` }}/>
                     </div>
                     {descs[i] && <div className="percept-desc">{descs[i]}</div>}
                   </div>
@@ -457,8 +738,8 @@ export default function App() {
 
             {/* INSIGHTS */}
             <div className="section-block">
-              <div className="block-title">Detected Insights</div>
-              <div className="block-sub">Based on real analysis of your site's content and positioning</div>
+              <div className="block-title">Perception Signals Detected</div>
+              <div className="block-sub">Based on direct analysis of your site's content, copy and structure</div>
               <div className="insight-list">
                 {(report.insights || []).map((ins, i) => (
                   <div key={i} className="insight-item">
@@ -471,8 +752,8 @@ export default function App() {
 
             {/* LOCKED */}
             <div className="section-block">
-              <div className="block-title">Detailed Opportunities</div>
-              <div className="block-sub">Unlock the full report to access your personalized recommendations</div>
+              <div className="block-title">Strategic Recommendations</div>
+              <div className="block-sub">Unlock the full report for your complete perception improvement plan</div>
               <div className="locked-grid">
                 {LOCKED_CARDS.map((c, i) => (
                   <div key={i} className="locked-card">
@@ -481,7 +762,7 @@ export default function App() {
                       <div className="locked-card-desc">{c.desc}</div>
                     </div>
                     <div className="locked-badge">
-                      <div style={{ fontSize:"1.2rem" }}>🔒</div>
+                      <div style={{ fontSize:"1.1rem" }}>🔒</div>
                       <div className="locked-pill">Locked</div>
                     </div>
                   </div>
@@ -491,11 +772,11 @@ export default function App() {
 
             {/* CTA */}
             <div className="cta-box">
-              <h2>Want the full Perception Report?</h2>
-              <p>Get a personalized review and discover exactly how to improve your website's positioning, trust and perceived value.</p>
+              <h2>Perception drives conversion.</h2>
+              <p>Get a personalized review and discover exactly how to improve the signals that influence trust, authority and perceived value.</p>
               <div className="cta-btns">
-                <button className="btn-primary" style={{ fontSize:"1rem", padding:"1rem 2.25rem" }}>Book a Free Review Call</button>
-                <button className="btn-secondary" style={{ fontSize:"1rem", padding:"1rem 2.25rem" }}>Unlock Full Report</button>
+                <button className="btn-primary" style={{ fontSize:"0.9rem", padding:"0.9rem 2rem" }}>Book a Free Review Call</button>
+                <button className="btn-secondary" style={{ fontSize:"0.9rem", padding:"0.9rem 2rem" }}>Unlock Full Report</button>
               </div>
             </div>
 
@@ -505,9 +786,18 @@ export default function App() {
           </div>
         )}
 
+        {/* ── FOOTER ── */}
         <footer className="footer">
-          © 2025 PerceptionScore · For businesses that compete on quality, not price.
+          <div className="footer-logo">
+            <EyeLogo size={28}/>
+            <span style={{ fontFamily:"'Inter Tight','Inter',sans-serif", fontWeight:700, fontSize:"0.82rem", color:"var(--muted2)" }}>
+              Perception Score
+            </span>
+          </div>
+          <div className="footer-tagline">Understand How You Are Perceived</div>
+          <div style={{ marginTop:"0.5rem" }}>© 2025 Perception Score · Perception drives conversion.</div>
         </footer>
+
       </div>
     </>
   );
