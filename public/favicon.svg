@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 36">
+  <path d="M32 2C18 2 4 18 4 18C4 18 18 34 32 34C46 34 60 18 60 18C60 18 46 2 32 2Z"
+    stroke="#F5F1E8" stroke-width="2.2" fill="#111111" stroke-linejoin="round"/>
+  <circle cx="32" cy="18" r="9" stroke="#F5F1E8" stroke-width="2" fill="#111111"/>
+  <text x="32" y="22.5" text-anchor="middle"
+    font-family="'Inter Tight','Inter',system-ui,sans-serif" font-weight="800"
+    font-size="9" fill="#E06A2C" letter-spacing="-0.5">PS</text>
+</svg>

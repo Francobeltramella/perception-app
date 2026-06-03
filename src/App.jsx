@@ -370,6 +370,52 @@ const css = `
   /* ── DIVIDER ── */
   .divider { height: 1px; background: var(--border); margin: 0; }
 
+  /* ── SEO CONTENT SECTIONS ── */
+  .seo-sections { max-width: 820px; margin: 0 auto; padding: 0 2rem 2rem; }
+  .seo-section { padding: 5rem 0; border-bottom: 1px solid var(--border); }
+  .seo-section:last-child { border-bottom: none; }
+  .seo-section h2 {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 800;
+    letter-spacing: -0.025em; color: var(--text);
+    margin-bottom: 1.25rem; line-height: 1.15;
+  }
+  .seo-section h2 em { font-style: normal; color: var(--copper); }
+  .seo-section p { font-size: 0.97rem; color: var(--muted2); line-height: 1.85; max-width: 640px; }
+  .seo-section ul { margin-top: 1.25rem; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .seo-section ul li {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 0.9rem; color: var(--muted2); line-height: 1.6;
+  }
+  .seo-section ul li::before {
+    content: ''; display: inline-block; width: 5px; height: 5px;
+    background: var(--copper); border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* ── FAQ ── */
+  .faq-section { max-width: 820px; margin: 0 auto; padding: 0 2rem 6rem; }
+  .faq-section h2 {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 800;
+    letter-spacing: -0.025em; color: var(--text);
+    margin-bottom: 2.5rem; line-height: 1.15;
+  }
+  .faq-list { display: flex; flex-direction: column; gap: 0; }
+  .faq-item { border-top: 1px solid var(--border); padding: 1.6rem 0; }
+  .faq-item:last-child { border-bottom: 1px solid var(--border); }
+  .faq-q {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 0.95rem; font-weight: 700; color: var(--text);
+    margin-bottom: 0.65rem; line-height: 1.4;
+  }
+  .faq-a { font-size: 0.86rem; color: var(--muted2); line-height: 1.8; max-width: 660px; }
+
+  @media (max-width: 600px) {
+    .seo-sections { padding: 0 1.25rem 1rem; }
+    .seo-section { padding: 3.5rem 0; }
+    .faq-section { padding: 0 1.25rem 4rem; }
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 600px) {
     .nav { padding: 1rem 1.25rem; }
@@ -607,6 +653,74 @@ export default function App() {
                     <div className="step-num">0{i + 1}</div>
                     <div className="step-title">{t}</div>
                     <div className="step-desc">{d}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── SEO CONTENT SECTIONS ── */}
+            <div className="seo-sections">
+              <section className="seo-section">
+                <h2>What Is <em>Website Perception?</em></h2>
+                <p>
+                  Website perception is the impression visitors form within seconds of landing on your website.
+                  Trust, authority, clarity, design quality, and messaging all influence whether users stay,
+                  engage, or leave. Before a visitor reads a single sentence, they have already judged whether
+                  your business is credible, premium, and worth their time.
+                </p>
+              </section>
+
+              <section className="seo-section">
+                <h2>Why First Impressions Matter</h2>
+                <p>
+                  Most visitors decide whether they trust a business before reading the entire page.
+                  Small perception signals — typography, spacing, copy clarity, visual hierarchy — can
+                  significantly impact conversions, lead quality, and overall business growth. A website
+                  that fails to communicate authority and credibility loses potential clients before the
+                  conversation even starts.
+                </p>
+              </section>
+
+              <section className="seo-section">
+                <h2>How Perception Score Works</h2>
+                <p>
+                  Perception Score evaluates the visual, structural, and communication signals that influence
+                  how your website is perceived by potential customers. The platform reads your live site
+                  content and scores seven perception dimensions using the P.E.R.C.E.P.T. framework.
+                </p>
+                <ul>
+                  <li>Trust Signals</li>
+                  <li>Authority Signals</li>
+                  <li>Message Clarity</li>
+                  <li>Positioning Strength</li>
+                  <li>Credibility Indicators</li>
+                  <li>User Experience Quality</li>
+                  <li>Premium Feel &amp; Design Professionalism</li>
+                </ul>
+              </section>
+            </div>
+
+            {/* ── FAQ ── */}
+            <section className="faq-section">
+              <h2>Frequently Asked Questions</h2>
+              <div className="faq-list">
+                {[
+                  ["What is a perception score?",
+                   "A perception score is a quantitative measurement of how your website is perceived by potential customers. It evaluates trust signals, authority indicators, clarity of messaging, credibility, design quality, and overall professional impression across seven dimensions using the P.E.R.C.E.P.T. framework."],
+                  ["How do users judge a website?",
+                   "Users form a first impression within 50 milliseconds of landing on a website. They judge based on visual design quality, clarity of messaging, trust signals like testimonials and professional copy, authority indicators, and how well the site communicates the value of its offer. These signals determine whether a visitor stays, engages, or leaves."],
+                  ["Why does website trust matter?",
+                   "Website trust directly affects conversion rates, lead quality, and revenue. Visitors who don't trust a website won't submit forms, make purchases, or book calls — regardless of how good the underlying product or service is. Building trust through clear signals is one of the highest-leverage improvements a business can make."],
+                  ["What makes a website look professional?",
+                   "A professional website communicates clarity, competence, and consistency. Key factors include intentional typography, clear and specific messaging, social proof, a coherent visual identity, fast load times, and copy that speaks directly to the target audience's problem and desired outcome."],
+                  ["How can I improve my website's credibility?",
+                   "To improve website credibility, focus on: specific and outcome-oriented copy (not vague claims), visible social proof, a clear and professional visual identity, a well-defined value proposition above the fold, and trust signals like guarantees, credentials, or media mentions."],
+                  ["How is Perception Score different from SEO tools?",
+                   "Perception Score is not an SEO tool. SEO tools measure technical signals for search engines. Perception Score measures human signals — how real visitors perceive and judge your website. It evaluates trust, authority, credibility, clarity, and premium feel: the factors that determine whether a visitor converts into a client, not whether they find you on Google."],
+                ].map(([q, a], i) => (
+                  <div key={i} className="faq-item">
+                    <div className="faq-q">{q}</div>
+                    <div className="faq-a">{a}</div>
                   </div>
                 ))}
               </div>
